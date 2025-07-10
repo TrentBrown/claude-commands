@@ -17,6 +17,7 @@ This is a collection of **AI-driven Claude Code commands** where:
 - `/create-plan <issue-id>` - AI generates planning templates with intelligent codebase analysis
 - `/save-plan <issue-id>` - AI captures planning session results through conversation analysis
 - `/update-context <issue-id>` - AI updates progress tracking during implementation
+- `/resume <issue-id>` - AI restores full context when returning to work on an issue
 
 ### Development Commands
 - `/commit [--no-verify]` - AI executes intelligent commit workflow with conventional commits and emoji
@@ -34,6 +35,7 @@ This is a collection of **AI-driven Claude Code commands** where:
 ├── save-issue.md          # AI execution instructions for issue data capture
 ├── save-plan.md           # AI execution instructions for plan saving
 ├── update-context.md      # AI execution instructions for context tracking
+├── resume.md              # AI execution instructions for context recovery
 ├── commit-helpers.js      # Utility functions for commit analysis and emoji mapping
 └── templates.js           # Template utility functions for issues and plans
 ```
@@ -47,6 +49,7 @@ The commands implement a structured issue management workflow driven by AI:
 3. **Planning**: `/create-plan <id>` - AI generates planning templates with intelligent codebase analysis
 4. **Plan Completion**: `/save-plan <id>` - AI analyzes conversation and captures planning results
 5. **Implementation Tracking**: `/update-context <id>` - AI tracks progress with multiple modes (progress, quick, discovery, blocker)
+6. **Context Recovery**: `/resume <id>` - AI restores full context when resuming work across sessions
 
 ## Issue Types and Templates
 
