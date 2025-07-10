@@ -194,7 +194,19 @@ If `noVerify` is false:
 - If user provides message, use it; otherwise use suggested message
 
 ### Step 7: Create Commit
-- Run `git commit -m "message"` with the final message
+- Check if the commit message contains newlines (`\n`) or multiple lines
+- **For single-line messages**: Use `git commit -m "message"`
+- **For multi-line messages**: Use heredoc approach to preserve formatting:
+  ```bash
+  git commit -m "$(cat <<'EOF'
+  {first-line-of-message}
+  
+  {additional-lines-or-body}
+  {any-other-content}
+  EOF
+  )"
+  ```
+- Important: Always preserve the full commit message content, including line breaks
 - Show success message with commit details
 - Run `git log -1 --oneline` to show the created commit
 
