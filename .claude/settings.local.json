@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__filesystem__create_directory",
+      "mcp__ide__executeCode",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}
