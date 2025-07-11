@@ -3,7 +3,9 @@
     "allow": [
       "mcp__filesystem__create_directory",
       "mcp__ide__executeCode",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(claude --version)"
     ],
     "deny": []
   }

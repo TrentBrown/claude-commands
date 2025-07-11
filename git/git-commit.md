@@ -6,12 +6,12 @@ This command helps you create well-formatted commits with conventional commit me
 
 To create a commit, just type:
 ```
-/commit
+/git:commit
 ```
 
 Or with options:
 ```
-/commit --no-verify
+/git:commit --no-verify
 ```
 
 ## What This Command Does
@@ -184,7 +184,7 @@ If `noVerify` is false:
 ### Step 5: Analyze Changes
 - Run `git diff --cached` to get diff output
 - Run `git diff --cached --name-only` to get list of changed files
-- Import commit-helpers.js: `import { analyzeChanges } from './commit-helpers.js'`
+- Import commit-helpers.js: `import { analyzeChanges } from './git/commit-helpers.js'`
 - Call `analyzeChanges(diffOutput, fileList)` to get suggested commit message
 - Display suggested commit message
 
@@ -230,7 +230,7 @@ Import from commit-helpers.js:
 
 ### Example Execution Flow
 ```
-User: /commit
+User: /git:commit
 AI: 
 1. Validates git repository
 2. Runs pre-commit checks (lint, build)

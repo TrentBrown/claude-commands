@@ -12,31 +12,37 @@ This is a collection of **AI-driven Claude Code commands** where:
 ## Available AI-Driven Commands
 
 ### Issue Management Commands
-- `/create-issue <issue-id> [type]` - AI creates structured issue templates using templates.js helpers
-- `/save-issue <issue-id> [summary]` - AI conducts interactive content capture for comprehensive issue details  
-- `/create-plan <issue-id>` - AI generates planning templates with intelligent codebase analysis
-- `/save-plan <issue-id>` - AI captures planning session results through conversation analysis
-- `/update-context <issue-id>` - AI updates progress tracking during implementation
-- `/resume <issue-id>` - AI restores full context when returning to work on an issue
+- `/issue-create <issue-id> [type]` - AI creates structured issue templates using templates.js helpers
+- `/issue-save <issue-id> [summary]` - AI conducts interactive content capture for comprehensive issue details  
+- `/plan-create <issue-id>` - AI generates planning templates with intelligent codebase analysis
+- `/plan-save <issue-id>` - AI captures planning session results through conversation analysis
+
+### Context Management Commands
+- `/context-save <issue-id>` - AI updates progress tracking during implementation
+- `/context-load <issue-id>` - AI restores full context when returning to work on an issue
 
 ### Development Commands
-- `/commit [--no-verify]` - AI executes intelligent commit workflow with conventional commits and emoji
+- `/git-commit [--no-verify]` - AI executes intelligent commit workflow with conventional commits and emoji
   - AI runs pre-commit checks (lint, build) unless `--no-verify` specified
-  - AI analyzes changes using commit-helpers.js to suggest appropriate commit messages
+  - AI analyzes changes using git/commit-helpers.js to suggest appropriate commit messages
   - AI supports extensive emoji mapping for commit types
 
 ## Project Structure
 
 ```
 /Users/trent.brown/.claude/commands/
-├── commit.md              # AI execution instructions for commit workflow
-├── create-issue.md        # AI execution instructions for issue creation
-├── create-plan.md         # AI execution instructions for plan generation
-├── save-issue.md          # AI execution instructions for issue data capture
-├── save-plan.md           # AI execution instructions for plan saving
-├── update-context.md      # AI execution instructions for context tracking
-├── resume.md              # AI execution instructions for context recovery
-├── commit-helpers.js      # Utility functions for commit analysis and emoji mapping
+├── issue/
+│   ├── issue-create.md    # AI execution instructions for issue creation
+│   └── issue-save.md      # AI execution instructions for issue data capture
+├── plan/
+│   ├── plan-create.md     # AI execution instructions for plan generation
+│   └── plan-save.md       # AI execution instructions for plan saving
+├── context/
+│   ├── context-save.md    # AI execution instructions for context tracking
+│   └── context-load.md    # AI execution instructions for context recovery
+├── git/
+│   ├── git-commit.md      # AI execution instructions for commit workflow
+│   └── commit-helpers.js  # Utility functions for commit analysis and emoji mapping
 └── templates.js           # Template utility functions for issues and plans
 ```
 
@@ -44,12 +50,12 @@ This is a collection of **AI-driven Claude Code commands** where:
 
 The commands implement a structured issue management workflow driven by AI:
 
-1. **Issue Creation**: `/create-issue <id> [type]` - AI creates structured templates using templates.js
-2. **Issue Completion**: `/save-issue <id>` - AI conducts interactive data capture with type-specific prompts
-3. **Planning**: `/create-plan <id>` - AI generates planning templates with intelligent codebase analysis
-4. **Plan Completion**: `/save-plan <id>` - AI analyzes conversation and captures planning results
-5. **Implementation Tracking**: `/update-context <id>` - AI tracks progress with multiple modes (progress, quick, discovery, blocker)
-6. **Context Recovery**: `/resume <id>` - AI restores full context when resuming work across sessions
+1. **Issue Creation**: `/issue-create <id> [type]` - AI creates structured templates using templates.js
+2. **Issue Completion**: `/issue-save <id>` - AI conducts interactive data capture with type-specific prompts
+3. **Planning**: `/plan-create <id>` - AI generates planning templates with intelligent codebase analysis
+4. **Plan Completion**: `/plan-save <id>` - AI analyzes conversation and captures planning results
+5. **Implementation Tracking**: `/context-save <id>` - AI tracks progress with multiple modes (progress, quick, discovery, blocker)
+6. **Context Recovery**: `/context-load <id>` - AI restores full context when resuming work across sessions
 
 ## Issue Types and Templates
 

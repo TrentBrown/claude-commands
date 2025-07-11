@@ -5,13 +5,13 @@ This command captures the results of an interactive planning session by analyzin
 ## Usage
 
 ```
-/save-plan <issue-id> [summary]
+/plan:save <issue-id> [summary]
 ```
 
 Examples:
 ```
-/save-plan 123
-/save-plan 456 "Updated with new authentication approach"
+/plan:save 123
+/plan:save 456 "Updated with new authentication approach"
 ```
 
 ## Parameters
@@ -67,10 +67,10 @@ The command updates the existing PLAN-{id}.md file by:
 
 This command is the capture point in the planning workflow:
 
-1. `/create-plan 123` - Creates structured template with analysis
+1. `/plan:create 123` - Creates structured template with analysis
 2. Interactive planning session in plan mode
-3. **`/save-plan 123`** - Captures session results ← You are here
-4. `/update-context 123` - Track progress during implementation
+3. **`/plan:save 123`** - Captures session results ← You are here
+4. `/context:save 123` - Track progress during implementation
 
 ## Review and Revision
 
@@ -122,7 +122,7 @@ Prompt for specific planning elements:
 - Show plan file path
 - Display summary if provided
 - Remind user this creates immutable planning record
-- Suggest next steps (begin implementation, track with `/update-context`)
+- Suggest next steps (begin implementation, track with `/context:save`)
 
 ### Content Structure
 Update plan file maintaining this format:

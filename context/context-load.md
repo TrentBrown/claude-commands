@@ -1,17 +1,17 @@
-# Claude Command: Resume
+# Claude Command: Load Context
 
 This command restores full context for an issue when starting a new session by aggregating information from all available sources.
 
 ## Usage
 
 ```
-/resume <issue-id>
+/context:load <issue-id>
 ```
 
 Examples:
 ```
-/resume 123
-/resume scratch
+/context:load 123
+/context:load scratch
 ```
 
 ## Parameters
@@ -171,9 +171,9 @@ Present information using this structure:
 This command supports seamless context recovery:
 
 1. Start new Claude session
-2. **`/resume {issue-id}`** ← Restore full context
+2. **`/context:load {issue-id}`** ← Restore full context
 3. Continue implementation work
-4. Use `/update-context {issue-id}` to track new progress
+4. Use `/context:save {issue-id}` to track new progress
 5. Repeat cycle as needed
 
 ## Notes

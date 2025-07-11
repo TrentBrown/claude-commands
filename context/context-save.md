@@ -1,18 +1,18 @@
-# Claude Command: Update Context
+# Claude Command: Save Context
 
 This command updates the context file for an issue with current progress, discoveries, and work status. It serves as a living document to track implementation progress and preserve context across sessions.
 
 ## Usage
 
 ```
-/update-context <issue-id> [mode]
+/context:save <issue-id> [mode]
 ```
 
 Examples:
 ```
-/update-context 123
-/update-context 456 quick
-/update-context scratch progress
+/context:save 123
+/context:save 456 quick
+/context:save scratch progress
 ```
 
 ## Parameters
@@ -125,9 +125,9 @@ Need to verify SMTP configuration works in all environments.
 
 This command supports the development workflow:
 
-1. `/create-issue 123` → `/create-plan 123` → `/save-plan 123`
+1. `/issue:create 123` → `/plan:create 123` → `/plan:save 123`
 2. Begin implementation work
-3. **`/update-context 123`** ← Regular progress tracking
+3. **`/context:save 123`** ← Regular progress tracking
 4. Continue work, repeat context updates
 5. Complete implementation
 

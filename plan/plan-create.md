@@ -5,13 +5,13 @@ This command creates a new plan file based on an existing issue, with codebase a
 ## Usage
 
 ```
-/create-plan <issue-id>
+/plan:create <issue-id>
 ```
 
 Examples:
 ```
-/create-plan 123
-/create-plan scratch
+/plan:create 123
+/plan:create scratch
 ```
 
 ## Parameters
@@ -22,7 +22,7 @@ Examples:
 
 1. **Validates environment**:
    - Checks for CLAUDE.md (suggests `/init` if missing)
-   - Checks for ISSUE-{id}.md (suggests `/create-issue` if missing)
+   - Checks for ISSUE-{id}.md (suggests `/issue:create` if missing)
 
 2. **Handles existing plans**:
    - If PLAN-{id}.md exists, creates versioned backup (PLAN-{id}-v1.md, etc.)
@@ -41,7 +41,7 @@ Examples:
 
 5. **Prompts next steps**:
    - Suggests entering plan mode for interactive planning
-   - Explains workflow with `/save-plan` command
+   - Explains workflow with `/plan:save` command
 
 ## File Structure Created
 
@@ -92,10 +92,10 @@ Analysis is designed to be helpful but not overwhelming, with suggestions for de
 
 This command is designed to work with the planning workflow:
 
-1. `/create-plan 123` - Creates structured plan with analysis
+1. `/plan:create 123` - Creates structured plan with analysis
 2. Enter plan mode manually for interactive planning session
-3. `/save-plan 123` - Captures planning results from conversation
-4. `/update-context 123` - Track ongoing progress
+3. `/plan:save 123` - Captures planning results from conversation
+4. `/context:save 123` - Track ongoing progress
 
 ## Implementation Instructions for AI
 
@@ -143,7 +143,7 @@ Based on issue type, analyze relevant areas:
 ### Step 7: Provide Success Feedback
 - Show plan file path
 - Display issue type and analysis summary
-- Remind user of next steps (planning session, then `/save-plan`)
+- Remind user of next steps (planning session, then `/plan:save`)
 
 ### Template Structure
 Generate plan using this format:
@@ -190,7 +190,7 @@ Generate plan using this format:
 
 ## Notes
 
-- Plan files become immutable after `/save-plan` - use versioning for revisions
+- Plan files become immutable after `/plan:save` - use versioning for revisions
 - Codebase analysis suggestions help guide deeper investigation
 - Template sections are left empty for collaborative planning session
 - Always creates a fresh plan to incorporate latest codebase state
