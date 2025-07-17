@@ -120,7 +120,7 @@ When executing this command, follow these steps:
   - Requirements section content
 
 ### Step 4: Generate Plan Template
-- Use templates.js helper: `import { getPlanTemplate } from './templates.js'`
+- Use the inline template function below to generate the plan template
 - Create basic plan structure with:
   - Overview (populated from issue description)
   - Codebase Analysis (to be filled with project-specific analysis)
@@ -194,3 +194,44 @@ Generate plan using this format:
 - Codebase analysis suggestions help guide deeper investigation
 - Template sections are left empty for collaborative planning session
 - Always creates a fresh plan to incorporate latest codebase state
+
+## Inline Template Function
+
+Use this JavaScript code to generate the plan template:
+
+```javascript
+function getPlanTemplate(issueId, issueTitle, issueDescription) {
+    const date = new Date().toISOString().split('T')[0];
+    
+    return `# Plan - Issue #${issueId}: ${issueTitle}
+
+## Overview
+${issueDescription || 'To be defined during planning session'}
+
+## Codebase Analysis
+**Project Structure:**
+- Standard project structure detected
+
+**Relevant Dependencies:**
+- No specific dependencies identified
+
+**Analysis Suggestions:**
+- Manual codebase review recommended
+
+## Technical Approach
+*To be filled during planning session*
+
+## Implementation Steps
+*To be filled during planning session*
+
+## Testing Strategy
+*To be filled during planning session*
+
+## Risks & Considerations
+*To be filled during planning session*
+
+---
+*Created: ${date}*
+*Last Updated: ${date}*`;
+}
+```

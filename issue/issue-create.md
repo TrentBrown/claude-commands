@@ -112,9 +112,8 @@ When executing this command, follow these steps:
 - If file already exists, prompt user for overwrite confirmation
 
 ### Step 5: Generate Template Content
-- Import templates.js helper: `import { getIssueTemplate } from './templates.js'`
-- Generate appropriate template using: `getIssueTemplate(issueId, type)`
-- This will create type-specific template with proper sections
+- Use the inline template function below to generate the template content
+- The template will include type-specific sections based on the issue type
 
 ### Step 6: Write File and Provide Feedback
 - Write the template content to the target file
@@ -123,7 +122,6 @@ When executing this command, follow these steps:
 - Remind user about the workflow: create-issue → save-issue → create-plan
 
 ### Error Handling
-- Check if templates.js helper exists, if not show error
 - Handle file system errors gracefully
 - Provide clear error messages for common issues
 
@@ -146,3 +144,83 @@ AI:
 - All dates are auto-populated in ISO format
 - Issue ID is automatically inserted throughout the template
 - Template structure matches the comprehensive format expected by `/save-issue`
+
+## Inline Template Function
+
+Use this JavaScript code to generate the issue template:
+
+```javascript
+function getIssueTemplate(issueId, type) {
+    const date = new Date().toISOString().split('T')[0];
+    
+    let template = `# Issue #${issueId}: [Title]
+
+## Type
+**Type:** ${type}
+
+## Description
+<!-- Clear, concise description of what needs to be done -->
+
+## Background/Context
+<!-- Why is this needed? What problem does it solve? -->
+
+## Requirements
+<!-- What specifically needs to be implemented/fixed/changed? -->
+
+## Acceptance Criteria
+<!-- How do we know when this is complete? -->
+- [ ] 
+- [ ] 
+- [ ] 
+
+## Technical Notes
+<!-- Technical constraints, dependencies, implementation hints -->
+
+## References
+<!-- Links to external issue tracker, designs, docs, related PRs -->
+- External Issue: [Link to proprietary system]
+- Related: 
+
+## Estimate
+<!-- Rough size estimate: XS | S | M | L | XL -->
+**Size:** 
+
+---
+*Created: ${date}*
+*Last Updated: ${date}*`;
+
+    // Add type-specific sections
+    if (type === 'fix') {
+        template = template.replace('---', `
+
+## Bug Details
+**Steps to Reproduce:**
+1. 
+2. 
+3. 
+
+**Expected Behavior:**
+
+**Actual Behavior:**
+
+**Environment:**
+- OS: 
+- Browser/Version: 
+- Other relevant details: 
+
+---`);
+    } else if (type === 'feat') {
+        template = template.replace('---', `
+
+## User Story
+As a [user type], I want [functionality] so that [benefit].
+
+## Design Notes
+<!-- UI/UX considerations, mockups, user flow -->
+
+---`);
+    }
+    
+    return template;
+}
+```

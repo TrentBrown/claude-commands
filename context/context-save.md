@@ -43,6 +43,9 @@ Examples:
    - Documents decision rationale
    - Tracks evolving understanding
    - Records problem-solving approach
+   - Includes a summary of recent actions in the current session: Briefly describes the commands executed and their outcomes.
+   - Lists key decisions and changes in the current session: Briefly notes any changes to the plan or code that resulted from the session.
+   - References important Files: If Claude worked with specific files in the current session, mention them and their current status.
 
 ## Update Modes
 
