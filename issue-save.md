@@ -5,13 +5,13 @@ This command captures the details of an issue by analyzing discussions and updat
 ## Usage
 
 ```
-/issue:save <issue-id> [summary]
+/issue-save <issue-id> [summary]
 ```
 
 Examples:
 ```
-/issue:save 4708
-/issue:save 123 "Updated requirements after stakeholder review"
+/issue-save 4708
+/issue-save 123 "Updated requirements after stakeholder review"
 ```
 
 ## Parameters
@@ -86,12 +86,12 @@ The command updates the existing ISSUE-{id}.md file by:
 
 This command completes the symmetric issue workflow:
 
-1. `/issue:create 123 feat` - Creates structured template
+1. `/issue-create 123 feat` - Creates structured template
 2. Research requirements, discuss with stakeholders
-3. **`/issue:save 123`** - Captures comprehensive issue details ← You are here
-4. `/plan:create 123` - Generate implementation plan
-5. `/plan:save 123` - Capture planning results
-6. `/context:save 123` - Track implementation progress
+3. **`/issue-save 123`** - Captures comprehensive issue details ← You are here
+4. `/plan-create 123` - Generate implementation plan
+5. `/plan-save 123` - Capture planning results
+6. `/context-save 123` - Track implementation progress
 
 ## Review and Iteration
 
@@ -215,7 +215,7 @@ Generate updated content using this structure:
 
 ## Notes
 
-- Works with issues created by `/issue:create` command
+- Works with issues created by `/issue-create` command
 - Can be run multiple times to refine issue content
 - Maintains all original template structure and metadata
 - Issue becomes comprehensive reference after saving

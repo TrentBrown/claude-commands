@@ -5,14 +5,14 @@ This command creates a new issue folder and ISSUE.md file with a structured temp
 ## Usage
 
 ```
-/issue:create <issue-id> [type]
+/issue-create <issue-id> [type]
 ```
 
 Examples:
 ```
-/issue:create 123
-/issue:create 456 feat
-/issue:create scratch fix
+/issue-create 123
+/issue-create 456 feat
+/issue-create scratch fix
 ```
 
 ## Parameters
@@ -80,12 +80,12 @@ The command uses different templates based on the issue type:
 
 This command starts the symmetric issue workflow:
 
-1. **`/issue:create 123 feat`** - Creates structured template ← You are here
+1. **`/issue-create 123 feat`** - Creates structured template ← You are here
 2. Research requirements, discuss with stakeholders
-3. **`/issue:save 123`** - Captures comprehensive issue details
-4. **`/plan:create 123`** - Generate implementation plan
-5. **`/plan:save 123`** - Capture planning results
-6. **`/context:save 123`** - Track implementation progress
+3. **`/issue-save 123`** - Captures comprehensive issue details
+4. **`/plan-create 123`** - Generate implementation plan
+5. **`/plan-save 123`** - Capture planning results
+6. **`/context-save 123`** - Track implementation progress
 
 ## Implementation Instructions for AI
 
@@ -127,7 +127,7 @@ When executing this command, follow these steps:
 
 ### Example Execution Flow
 ```
-User: /issue:create 123 feat
+User: /issue-create 123 feat
 AI: 
 1. Validates arguments (id=123, type=feat)
 2. Finds project root

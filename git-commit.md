@@ -6,12 +6,12 @@ This command helps you create well-formatted commits with conventional commit me
 
 To create a commit, just type:
 ```
-/git:commit
+/git-commit
 ```
 
 Or with options:
 ```
-/git:commit --no-verify
+/git-commit --no-verify
 ```
 
 ## What This Command Does
@@ -230,7 +230,7 @@ Import from commit-helpers.js:
 
 ### Example Execution Flow
 ```
-User: /git:commit
+User: /git-commit
 AI: 
 1. Validates git repository
 2. Runs pre-commit checks (lint, build)
