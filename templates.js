@@ -84,6 +84,20 @@ As a [user type], I want [functionality] so that [benefit].
 <!-- UI/UX considerations, mockups, user flow -->`;
 }
 
+// Refactor-specific template additions
+function getRefactorTemplateAdditions() {
+    return `
+
+## Current State
+<!-- What are the current limitations/problems? -->
+
+## Desired State
+<!-- What should the end result look like? -->
+
+## Migration Notes
+<!-- Backward compatibility, data migration, etc. -->`;
+}
+
 // Get complete issue template based on type
 function getIssueTemplate(issueId, type) {
     const baseTemplate = getBaseIssueTemplate(issueId, type);
@@ -93,6 +107,8 @@ function getIssueTemplate(issueId, type) {
             return baseTemplate.replace('---', getFixTemplateAdditions() + '\n\n---');
         case 'feat':
             return baseTemplate.replace('---', getFeatTemplateAdditions() + '\n\n---');
+        case 'refactor':
+            return baseTemplate.replace('---', getRefactorTemplateAdditions() + '\n\n---');
         default:
             return baseTemplate;
     }
@@ -140,6 +156,7 @@ export {
     getBaseIssueTemplate,
     getFixTemplateAdditions,
     getFeatTemplateAdditions,
+    getRefactorTemplateAdditions,
     getIssueTemplate,
     getPlanTemplate
 };

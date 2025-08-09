@@ -1,222 +1,383 @@
 # Claude Command: Save Issue
 
-This command captures the details of an issue by analyzing discussions and updating the issue file with comprehensive requirements, background, and acceptance criteria.
+This command creates or updates an issue file with comprehensive requirements, background, and acceptance criteria. It intelligently extracts details from the conversation context, minimizing the need for additional prompts.
 
 ## Usage
 
 ```
-/issue-save <issue-id> [summary]
+/issue-save <issue-id> [type-or-summary]
 ```
 
 Examples:
 ```
 /issue-save 4708
-/issue-save 123 "Updated requirements after stakeholder review"
+/issue-save 123 feat
+/issue-save 456 "Updated requirements after stakeholder review"
+/issue-save scratch fix
 ```
 
 ## Parameters
 
 - `<issue-id>` (required): Issue identifier (number or "scratch" for small scope work)
-- `[summary]` (optional): Brief description of what was updated in this save
+- `[type-or-summary]` (optional): 
+  - If issue file doesn't exist: Issue type (feat, fix, docs, style, refactor, perf, test, chore)
+  - If issue file exists: Brief description of what was updated in this save
 
 ## What This Command Does
 
+### If Issue File Doesn't Exist (Creation Mode)
+
+1. **Determines issue type**:
+   - Uses provided type parameter if given
+   - Or infers from conversation context (looking for keywords like "bug", "feature", "refactor")
+   - Or prompts user to select from: feat, fix, docs, style, refactor, perf, test, chore
+
+2. **Creates file structure**:
+   - Creates `.claude/issues/{issue-id}/` directory
+   - Generates type-specific template
+   - Creates `ISSUE-{issue-id}.md` file
+
+3. **Proceeds to content extraction** (same as update mode below)
+
+### If Issue File Exists (Update Mode)
+
 1. **Validates environment**:
    - Checks that ISSUE-{id}.md exists
-   - Ensures we're in the correct project context
+   - Reads existing type and metadata
 
-2. **Captures issue details**:
-   - Prompts for comprehensive issue information
-   - Gathers requirements and background context
-   - Defines clear acceptance criteria
-   - Collects technical constraints and estimates
-   - Includes type-specific details (user stories, bug reproduction, etc.)
+2. **Extracts details from conversation context**:
+   - Analyzes the entire conversation history
+   - Intelligently extracts requirements, background, acceptance criteria
+   - Identifies technical constraints and implementation details
+   - Captures any bug reproduction steps, user stories, or design notes mentioned
+   - Infers size estimate based on discussion complexity
 
-3. **Updates issue file**:
+3. **Fills gaps if needed**:
+   - Reviews extracted information for completeness
+   - Only prompts for critical missing information
+   - Allows user to skip prompts if they prefer
+
+4. **Updates issue file**:
    - Preserves original creation metadata
-   - Fills in all template sections with captured content
+   - Fills in all template sections with extracted/captured content
    - Updates timestamp and adds summary note
    - Maintains proper issue structure
 
-4. **Presents for review**:
-   - Shows what was captured
-   - Prompts user to review and request changes if needed
-   - Allows iteration until satisfied
+5. **Presents for review**:
+   - Shows comprehensive summary of captured details
+   - Asks user if they want to add or modify anything
+   - Saves upon confirmation
 
-## Content Capture
+## Content Extraction Strategy
 
-The command prompts for structured information based on issue type:
+The command analyzes conversation context to extract:
 
 ### Base Information (all types)
-- **Title**: Clear, actionable issue title
-- **Description**: What needs to be done and why
-- **Background**: Context and motivation
-- **Requirements**: Specific technical requirements
-- **Acceptance Criteria**: How to know when complete
-- **Technical Notes**: Constraints, dependencies, hints
-- **Size Estimate**: Complexity/effort estimate (XS/S/M/L/XL)
+- **Title**: Inferred from problem statement or main topic discussed
+- **Description**: Synthesized from user's explanation of the need
+- **Background**: Context and motivation mentioned in discussion
+- **Requirements**: Technical requirements stated or implied
+- **Acceptance Criteria**: Success conditions mentioned or inferred
+- **Technical Notes**: Constraints, dependencies, tools discussed
+- **Size Estimate**: Inferred from scope of discussion (XS/S/M/L/XL)
 
-### Type-Specific Sections
+### Type-Specific Extraction
 
 **For `feat` issues:**
-- User story format
-- User experience considerations
-- API requirements (if applicable)
+- User stories from user need descriptions
+- UX considerations from interface discussions
+- API requirements from endpoint/data discussions
 
 **For `fix` issues:**
-- Bug reproduction steps
-- Expected vs actual behavior
-- Environment details
-- Error messages/logs
+- Bug symptoms and reproduction steps mentioned
+- Error messages or logs shared
+- Environment details from context
 
 **For `refactor` issues:**
-- Current limitations/problems
-- Desired end state
-- Migration considerations
+- Current problems/limitations discussed
+- Desired improvements mentioned
+- Migration or compatibility concerns raised
 
-## File Updates
+## File Structure
 
-The command updates the existing ISSUE-{id}.md file by:
-- **Preserving**: Creation date, original structure
-- **Updating**: All content sections with captured information
-- **Adding**: Updated timestamp and optional summary
-- **Maintaining**: Type-specific template structure
+```
+.claude/
+└── issues/
+    └── {issue-id}/
+        └── ISSUE-{issue-id}.md
+```
 
 ## Workflow Integration
 
-This command completes the symmetric issue workflow:
+This command handles both creation and saving in the issue workflow:
 
-1. `/issue-create 123 feat` - Creates structured template
-2. Research requirements, discuss with stakeholders
-3. **`/issue-save 123`** - Captures comprehensive issue details ← You are here
-4. `/plan-create 123` - Generate implementation plan
-5. `/plan-save 123` - Capture planning results
-6. `/context-save 123` - Track implementation progress
-
-## Review and Iteration
-
-After capturing content, the command:
-- Shows complete issue summary for review
-- Asks: "Does this accurately capture the issue requirements?"
-- Offers options to:
-  - Accept and save
-  - Request specific revisions
-  - Edit the file manually
+1. **`/issue-save 123 [type]`** - Creates template if needed, extracts details from context ← You are here
+2. `/plan-create 123` - Generate implementation plan
+3. `/plan-save 123` - Capture planning results
+4. `/context-save 123` - Track implementation progress
 
 ## Implementation Instructions for AI
 
 When executing this command, follow these steps:
 
-### Step 1: Parse Arguments and Validate
+### Step 1: Parse Arguments and Initial Setup
 - Extract `issue-id` from arguments (required)
-- Extract optional `summary` from remaining arguments
+- Extract optional second parameter (could be type or summary)
 - Find project root (look for .git or package.json)
-- Verify issue file exists at: `{project-root}/.claude/issues/{issue-id}/ISSUE-{issue-id}.md`
+- If not found, show error about not being in a project directory
 
-### Step 2: Read and Parse Existing Issue
+### Step 2: Check If Issue File Exists
+- Check for file at: `{project-root}/.claude/issues/{issue-id}/ISSUE-{issue-id}.md`
+- Branch based on whether file exists
+
+### Step 3A: If File Doesn't Exist (Creation Flow)
+
+**Determine Issue Type:**
+- If second parameter is a valid type (feat, fix, docs, style, refactor, perf, test, chore), use it
+- Otherwise, analyze conversation context to infer type:
+  - Keywords like "bug", "error", "broken", "not working" → fix
+  - Keywords like "feature", "add", "new", "implement" → feat
+  - Keywords like "refactor", "restructure", "reorganize", "cleanup" → refactor
+  - Keywords like "performance", "slow", "optimize", "speed up" → perf
+  - Keywords like "documentation", "docs", "readme" → docs
+  - Keywords like "test", "testing", "coverage" → test
+- If unable to infer with confidence, prompt user to select type
+
+**Create File Structure:**
+- Create directory: `{project-root}/.claude/issues/{issue-id}/`
+- Generate template using the inline template function (see below)
+- Write template to `ISSUE-{issue-id}.md`
+- Show creation confirmation
+
+**Continue to Step 4 (Content Extraction)**
+
+### Step 3B: If File Exists (Update Flow)
 - Read the existing issue file
+- **Show overwrite warning**: "Issue file already exists. This will update/overwrite the current content. Continue? (y/N)"
+- If user declines, exit gracefully
 - Extract current issue type (from `**Type:** {type}` line)
 - Extract creation date (from `*Created: {date}*` line)
 - Preserve these for final output
+- The second parameter (if provided) is treated as a summary
 
-### Step 3: Interactive Content Capture
-Based on the issue type, prompt for comprehensive information:
+### Step 4: Extract Content from Conversation Context
 
-**Base Information (all types):**
-- Issue title (clear and actionable)
-- Description (what needs to be done and why)
-- Background/Context (motivation for this work)
-- Requirements (specific technical requirements)
-- Acceptance Criteria (how to know when complete)
-- Technical Notes (constraints, dependencies, hints)
-- Size Estimate (XS/S/M/L/XL complexity)
+**Analyze entire conversation history to extract:**
 
-**Type-Specific Information:**
+**Base Information:**
+- **Title**: Look for clear problem statements, feature requests, or main topics
+- **Description**: Synthesize from user's explanations and requirements
+- **Background**: Extract motivation, why this is needed, problems being solved
+- **Requirements**: List all technical requirements mentioned or implied
+- **Acceptance Criteria**: Extract success conditions, "done when" statements
+- **Technical Notes**: Capture mentioned tools, frameworks, constraints, dependencies
+- **Size Estimate**: Infer from discussion scope (simple mention=XS, detailed discussion=M-L, complex multi-part=XL)
+
+**Type-Specific Extraction:**
 
 **For `feat` issues:**
-- User story (As a [user], I want [functionality] so that [benefit])
-- User experience considerations
-- API requirements (or "N/A" if not applicable)
+- Convert user need descriptions to user story format
+- Extract any UI/UX considerations mentioned
+- Note API endpoints, data structures, integrations discussed
 
 **For `fix` issues:**
-- Bug reproduction steps (step-by-step)
-- Expected behavior
-- Actual behavior
-- Environment details (OS, browser, version, etc.)
+- Extract any mentioned reproduction steps or sequences
+- Capture error messages, stack traces, logs shared
+- Note environment details (browser, OS, versions) if mentioned
+- Identify expected vs actual behavior from descriptions
 
 **For `refactor` issues:**
-- Current limitations/problems
-- Desired end state
-- Migration considerations
+- Extract current pain points and limitations
+- Capture desired end state or improvements
+- Note any migration or backward compatibility concerns
 
-### Step 4: Present Summary for Review
-Display comprehensive summary of captured information:
-- Title, type, description, background, requirements
-- Acceptance criteria, technical notes, size estimate
-- All type-specific content
-- Ask: "Does this accurately capture the issue requirements? (y/N)"
+### Step 5: Review Extracted Information
 
-### Step 5: Update Issue File
-If user confirms, update the issue file with:
-- Preserve original creation date
-- Update all content sections with captured information
-- Set current date as "Last Updated"
-- Add summary note if provided
-- Maintain proper markdown structure
+**Assess completeness:**
+- Check if title is clear and actionable
+- Verify description explains the what and why
+- Ensure at least 2-3 acceptance criteria exist
+- Confirm technical context is sufficient
 
-### Step 6: Provide Success Feedback
+**If critical information is missing:**
+- Prepare a minimal prompt for only the missing pieces
+- Example: "I've extracted most details from our discussion. Could you briefly provide: [missing items]?"
+- Allow user to skip with "Let's go with what we have"
+
+### Step 6: Present Summary for Review
+
+Display comprehensive summary:
+```
+I've captured the following from our discussion:
+
+**Title:** [extracted title]
+**Type:** [type]
+**Description:** [extracted description]
+
+**Requirements:**
+[extracted requirements]
+
+**Acceptance Criteria:**
+[extracted criteria]
+
+[Include type-specific sections]
+
+Would you like to:
+1. Save as-is
+2. Add or modify anything specific
+3. Let me fill in a few missing details
+```
+
+### Step 7: Handle User Response
+
+**If user wants to modify:**
+- Accept specific additions/changes
+- Update the extracted content accordingly
+
+**If user identifies gaps:**
+- Prompt for only those specific items
+- Keep prompts concise and focused
+
+**If user approves:**
+- Proceed to save
+
+### Step 8: Update Issue File
+
+Write the issue file with:
+- Preserve original creation date (or use current date if new)
+- All extracted and refined content
+- Current date as "Last Updated"
+- Summary note if provided
+- Proper markdown structure
+
+### Step 9: Provide Success Feedback
 - Show file path where issue was saved
-- Display summary if provided
-- Remind user of next steps in workflow
+- Display whether issue was created or updated
+- Brief summary of what was captured
+- Suggest next step: "Ready to create a plan? Use `/plan-create {issue-id}`"
 
-### Content Template Structure
-Generate updated content using this structure:
-```
-# Issue #{issue-id}: {title}
+### Content Extraction Tips
 
-## Type
-**Type:** {type}
+**Look for these patterns in conversation:**
+- "I need..." → requirement
+- "The problem is..." → background/context
+- "It should..." → acceptance criteria
+- "Currently..." → current state (for refactors)
+- "When I..." → reproduction steps (for bugs)
+- "Users want..." → user story elements
+- "Make sure..." → technical notes/constraints
+- "Don't forget..." → additional requirements
 
-## Description
-{description}
-
-## Background/Context
-{background}
-
-## Requirements
-{requirements}
-
-## Acceptance Criteria
-{acceptanceCriteria}
-
-## Technical Notes
-{technicalNotes}
-
-## References
-- External Issue: [Link to proprietary system]
-- Related: 
-
-## Estimate
-**Size:** {sizeEstimate}
-
-{type-specific-sections}
-
----
-*Created: {originalDate}*
-*Last Updated: {currentDate}*
-{summary-line-if-provided}
-```
+**Inference rules:**
+- If user describes a problem without solution → likely a fix
+- If user requests new capability → likely a feat
+- If user wants to improve existing code → likely a refactor
+- If discussion is brief/simple → likely XS or S
+- If multiple components discussed → likely M or larger
 
 ### Error Handling
-- Check if issue file exists, guide user to create it first
-- Handle invalid issue types gracefully
-- Provide clear error messages for file system issues
+- Handle file system errors gracefully
+- If context is completely inadequate, explain what's needed
 - Allow user to cancel operation at any point
+
+## Inline Template Function
+
+Use this JavaScript code to generate the issue template:
+
+```javascript
+function getIssueTemplate(issueId, type) {
+    const date = new Date().toISOString().split('T')[0];
+
+    let template = `# Issue #${issueId}: [Title]
+
+## Type
+**Type:** ${type}
+
+## Description
+<!-- Clear, concise description of what needs to be done -->
+
+## Background/Context
+<!-- Why is this needed? What problem does it solve? -->
+
+## Requirements
+<!-- What specifically needs to be implemented/fixed/changed? -->
+
+## Acceptance Criteria
+<!-- How do we know when this is complete? -->
+- [ ]
+- [ ]
+- [ ]
+
+## Technical Notes
+<!-- Technical constraints, dependencies, implementation hints -->
+
+## References
+<!-- Links to external issue tracker, designs, docs, related PRs -->
+- External Issue: [Link to proprietary system]
+- Related:
+
+## Estimate
+<!-- Rough size estimate: XS | S | M | L | XL -->
+**Size:**
+
+---
+*Created: ${date}*
+*Last Updated: ${date}*`;
+
+    // Add type-specific sections
+    if (type === 'fix') {
+        template = template.replace('---', `
+
+## Bug Details
+**Steps to Reproduce:**
+1.
+2.
+3.
+
+**Expected Behavior:**
+
+**Actual Behavior:**
+
+**Environment:**
+- OS:
+- Browser/Version:
+- Other relevant details:
+
+---`);
+    } else if (type === 'feat') {
+        template = template.replace('---', `
+
+## User Story
+As a [user type], I want [functionality] so that [benefit].
+
+## Design Notes
+<!-- UI/UX considerations, mockups, user flow -->
+
+---`);
+    } else if (type === 'refactor') {
+        template = template.replace('---', `
+
+## Current State
+<!-- What are the current limitations/problems? -->
+
+## Desired State
+<!-- What should the end result look like? -->
+
+## Migration Notes
+<!-- Backward compatibility, data migration, etc. -->
+
+---`);
+    }
+
+    return template;
+}
+```
 
 ## Notes
 
-- Works with issues created by `/issue-create` command
+- This command now intelligently extracts information from conversation context
+- Minimizes user prompts by inferring details from discussion
+- Only asks for critical missing information
 - Can be run multiple times to refine issue content
 - Maintains all original template structure and metadata
-- Issue becomes comprehensive reference after saving
-- Compatible with existing workflow and file structure
+- The command adapts to the amount of context available

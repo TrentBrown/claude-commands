@@ -18,6 +18,14 @@ Examples:
 
 - `<issue-id>` (required): Issue identifier (number or "scratch" for small scope work)
 
+## File Locations
+
+This command works with files in the following locations:
+- **Issue file**: `.claude/issues/{issue-id}/ISSUE-{issue-id}.md` (optional, for issue title)
+- **Learnings file**: `.claude/issues/{issue-id}/LEARNINGS-{issue-id}.md` (created/updated by this command)
+
+The command searches for these files relative to the project root (directory containing `.git` or `package.json`).
+
 ## What This Command Does
 
 1. **Analyzes conversation context**:
@@ -187,7 +195,7 @@ When executing this command, follow these steps:
 ### Step 1: Parse Arguments and Validate
 - Extract `issue-id` from arguments (required)
 - Find project root (look for .git or package.json)
-- Check if LEARNINGS-{id}.md exists
+- Check if `.claude/issues/{id}/LEARNINGS-{id}.md` exists
 
 ### Step 2: Analyze Conversation Context
 Scan conversation for learning indicators:
@@ -263,7 +271,7 @@ Only capture learnings that are:
 - Contextual (includes the "why")
 
 ## Error Handling
-- No ISSUE file: Create learnings anyway, note as "General Learnings"
+- No `.claude/issues/{id}/ISSUE-{id}.md` file: Create learnings anyway, note as "General Learnings"
 - No new learnings found: Inform user, suggest what to look for
 - Very long conversation: Focus on most significant learnings
 

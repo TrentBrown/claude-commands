@@ -1,6 +1,6 @@
 # Claude Command: Save Progress
 
-This command creates or updates the progress tracking file for an issue, managing implementation progress against the plan with session-by-session tracking.
+This command creates or updates the progress tracking file for an issue, managing implementation progress against the plan Markdown file (if one exists) with session-by-session tracking.
 
 ## Usage
 
@@ -25,17 +25,26 @@ Examples:
   - `quick`: Quick status update only
   - `complete`: Mark issue as complete
 
+## File Locations
+
+This command works with files in the following locations:
+- **Issue file**: `.claude/issues/{issue-id}/ISSUE-{issue-id}.md`
+- **Plan file**: `.claude/issues/{issue-id}/PLAN-{issue-id}.md`
+- **Progress file**: `.claude/issues/{issue-id}/PROGRESS-{issue-id}.md` (created/updated by this command)
+
+The command searches for these files relative to the project root (directory containing `.git` or `package.json`).
+
 ## What This Command Does
 
 ### First Time (Creates Progress File)
 
 1. **Validates prerequisites**:
-   - Checks for ISSUE-{id}.md (required)
-   - Checks for PLAN-{id}.md (required)
+   - Checks for `.claude/issues/{id}/ISSUE-{id}.md` (required)
+   - Checks for `.claude/issues/{id}/PLAN-{id}.md` (required)
    - Ensures issue has a plan to track against
 
 2. **Extracts plan structure**:
-   - Reads PLAN-{id}.md implementation steps
+   - Reads `.claude/issues/{id}/PLAN-{id}.md` implementation steps
    - Creates milestone tracking items
    - Initializes progress template
 
@@ -180,13 +189,13 @@ When executing this command, follow these steps:
 - Extract `issue-id` from arguments (required)
 - Extract optional `mode` (default: "session")
 - Find project root (look for .git or package.json)
-- Check if PROGRESS-{id}.md exists
+- Check if `.claude/issues/{id}/PROGRESS-{id}.md` exists
 
 ### Step 2: Handle File Creation or Update
 
 **If PROGRESS file doesn't exist:**
-- Verify ISSUE-{id}.md exists (error if missing)
-- Verify PLAN-{id}.md exists (error if missing)
+- Verify `.claude/issues/{id}/ISSUE-{id}.md` exists (error if missing)
+- Verify `.claude/issues/{id}/PLAN-{id}.md` exists (error if missing)
 - Read issue title and plan content
 - Extract milestones from plan implementation steps
 - Create initial progress file with template
@@ -255,8 +264,8 @@ function calculateOverallProgress(milestones) {
 ```
 
 ### Error Handling
-- Missing ISSUE: "Issue not found. Create with: /issue-create {id}"
-- Missing PLAN: "Plan not found. Create with: /plan-create {id}"
+- Missing ISSUE: "Issue not found at .claude/issues/{id}/ISSUE-{id}.md. Create with: /issue-create {id}"
+- Missing PLAN: "Plan not found at .claude/issues/{id}/PLAN-{id}.md. Create with: /plan-create {id}"
 - No plan milestones: Use generic milestones
 - Invalid percentage: Validate 0-100 range
 
@@ -266,11 +275,11 @@ function calculateOverallProgress(milestones) {
 function createProgressFile(issueId, issueTitle, milestones) {
     const date = new Date().toISOString().split('T')[0];
     const time = new Date().toTimeString().split(' ')[0].slice(0, 5);
-    
-    const milestonesFormatted = milestones.map(m => 
+
+    const milestonesFormatted = milestones.map(m =>
         `- [ ] ${m}: [0%]`
     ).join('\n');
-    
+
     return `# Progress - Issue #${issueId}: ${issueTitle}
 
 ## Overall Status
@@ -300,7 +309,7 @@ ${milestonesFormatted}
 - None yet
 
 **Files Modified:**
-- PROGRESS-${issueId}.md: Created
+- .claude/issues/${issueId}/PROGRESS-${issueId}.md: Created
 
 **Decisions:**
 - Using structured progress tracking
@@ -311,7 +320,7 @@ ${milestonesFormatted}
 ## Cumulative Changes
 **Total Files Modified:** 1
 **Key Files:**
-- PROGRESS-${issueId}.md: Progress tracking
+- .claude/issues/${issueId}/PROGRESS-${issueId}.md: Progress tracking
 
 **Dependencies Added:**
 - None yet
@@ -338,7 +347,7 @@ function addSessionEntry(content, mode, sessionData) {
     // Shows the structure of what to add
     const date = new Date().toISOString().split('T')[0];
     const time = new Date().toTimeString().split(' ')[0].slice(0, 5);
-    
+
     return `### Session: ${date} ${time}
 **Duration:** ${sessionData.duration}
 **Focus:** ${sessionData.focus}

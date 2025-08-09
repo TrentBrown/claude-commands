@@ -1,6 +1,6 @@
 # Claude Command: Save Plan
 
-This command captures the results of an interactive planning session by analyzing the conversation and updating the plan file with the technical decisions and implementation details discussed.
+This command creates or updates a plan file based on an existing issue. It reads the issue file first, then intelligently extracts technical approach and implementation details from the conversation context, minimizing the need for additional prompts.
 
 ## Usage
 
@@ -12,6 +12,7 @@ Examples:
 ```
 /plan-save 123
 /plan-save 456 "Updated with new authentication approach"
+/plan-save scratch
 ```
 
 ## Parameters
@@ -21,150 +22,320 @@ Examples:
 
 ## What This Command Does
 
-1. **Validates environment**:
-   - Checks that PLAN-{id}.md exists
-   - Ensures we're in the correct project context
+### Always First
+1. **Reads the issue file**:
+   - Ensures we have complete issue context
+   - Extracts requirements and background for planning
 
-2. **Analyzes conversation**:
-   - Reviews recent chat history for technical decisions
-   - Extracts implementation steps and approaches
-   - Identifies risks, considerations, and testing strategies
-   - Looks for specific technical details and code examples
+### If Plan File Doesn't Exist (Creation Mode)
 
-3. **Updates plan file**:
-   - Preserves original overview and codebase analysis
-   - Fills in the planning session results:
-     - Technical Approach
-     - Implementation Steps
-     - Testing Strategy
-     - Risks & Considerations
-     - Type-specific sections
+1. **Creates file structure**:
+   - Ensures `.claude/issues/{issue-id}/` directory exists
+   - Creates `PLAN-{issue-id}.md` file
 
-4. **Presents for review**:
-   - Shows what was extracted from the conversation
-   - Prompts user to review and request changes if needed
+2. **Performs codebase analysis**:
+   - Analyzes project structure and dependencies
+   - Identifies relevant files and patterns
+   - Generates type-specific analysis suggestions
+
+3. **Proceeds to content extraction** (same as update mode below)
+
+### If Plan File Exists (Update Mode)
+
+1. **Shows overwrite warning**:
+   - Warns user that existing plan will be updated
+   - Allows user to cancel if needed
+
+2. **Extracts details from conversation context**:
+   - Analyzes entire conversation history
+   - Extracts technical decisions and approaches
+   - Identifies implementation steps and sequencing
+   - Captures testing strategies mentioned
+   - Notes risks and considerations discussed
+
+3. **Fills gaps if needed**:
+   - Reviews extracted information for completeness
+   - Only prompts for critical missing planning details
+   - Allows user to skip prompts if they prefer
+
+4. **Updates plan file**:
+   - Preserves or updates codebase analysis
+   - Fills in all planning sections with extracted content
    - Updates timestamp and adds summary note
 
-## Conversation Analysis
+5. **Presents for review**:
+   - Shows comprehensive summary of captured plan
+   - Asks user if they want to add or modify anything
+   - Saves upon confirmation
 
-The command looks for key patterns in the chat history:
-- **Technical decisions**: "We should use...", "The approach is...", "Let's implement..."
-- **Implementation steps**: Numbered lists, task breakdowns, sequential actions
-- **Architecture choices**: Framework decisions, design patterns, data flow
-- **Risk identification**: "Watch out for...", "Potential issues...", "Consider..."
-- **Testing approaches**: "We need to test...", "Verify that...", "Check for..."
-- **Code specifics**: File names, function names, specific implementation details
+## Content Extraction Strategy
 
-## File Updates
+The command analyzes conversation context to extract:
 
-The command updates the existing PLAN-{id}.md file by:
-- **Preserving**: Overview, Codebase Analysis sections (from create-plan)
-- **Updating**: Technical Approach, Implementation Steps, Testing Strategy, Risks
-- **Adding**: Timestamp and summary of changes
-- **Maintaining**: Plan versioning history
+### Planning Information
+- **Technical Approach**: Architecture decisions, design patterns, frameworks chosen
+- **Implementation Steps**: Task breakdowns, sequencing, specific actions
+- **Testing Strategy**: Test types, validation approaches, success criteria
+- **Risks & Considerations**: Potential issues, edge cases, dependencies
+
+### Type-Specific Extraction
+
+**For `feat` issues:**
+- User experience flow and interactions
+- API design and data structures
+- Integration points
+
+**For `fix` issues:**
+- Root cause analysis discussed
+- Fix approach and validation
+- Regression prevention
+
+**For `refactor` issues:**
+- Migration strategy and phases
+- Backward compatibility approach
+- Rollback considerations
+
+## File Structure
+
+```
+.claude/
+└── issues/
+    └── {issue-id}/
+        ├── ISSUE-{issue-id}.md    # Must exist (read first)
+        └── PLAN-{issue-id}.md     # Created or updated
+```
 
 ## Workflow Integration
 
-This command is the capture point in the planning workflow:
+This command handles both creation and updating in the planning workflow:
 
-1. `/plan-create 123` - Creates structured template with analysis
-2. Interactive planning session in plan mode
-3. **`/plan-save 123`** - Captures session results ← You are here
-4. `/context-save 123` - Track progress during implementation
-
-## Review and Revision
-
-After analysis, the command:
-- Shows extracted content for user review
-- Asks: "Does this capture our discussion accurately?"
-- Offers options to:
-  - Accept and save
-  - Request specific revisions
-  - Manual edit the file directly
+1. `/issue-save 123` - Create/update issue with requirements
+2. **`/plan-save 123`** - Creates plan if needed, extracts approach from context ← You are here
+3. `/context-save 123` - Track implementation progress
 
 ## Implementation Instructions for AI
 
 When executing this command, follow these steps:
 
-### Step 1: Parse Arguments and Validate
+### Step 1: Parse Arguments and Initial Setup
 - Extract `issue-id` from arguments (required)
-- Extract optional `summary` from remaining arguments
+- Extract optional `summary` parameter
 - Find project root (look for .git or package.json)
-- Verify plan file exists at: `{project-root}/.claude/issues/{issue-id}/PLAN-{issue-id}.md`
+- If not found, show error about not being in a project directory
 
-### Step 2: Read Current Plan
-- Read the existing plan file
-- Extract current structure and any existing content
-- Identify which sections are still placeholder vs. filled
+### Step 2: Read Issue File (ALWAYS)
+- Check for issue file at: `{project-root}/.claude/issues/{issue-id}/ISSUE-{issue-id}.md`
+- If doesn't exist, inform user to create issue first with `/issue-save {issue-id}`
+- Read and parse the issue file to extract:
+  - Issue title (from first line)
+  - Issue type (from `**Type:** {type}` line)
+  - Description, requirements, and background
+  - Technical notes and constraints
 
-### Step 3: Analyze Recent Conversation
-- Review recent chat history (last 10-20 messages)
-- Extract technical decisions made during planning
-- Identify implementation approaches discussed
-- Note any risks or considerations mentioned
-- Capture testing strategies discussed
+### Step 3: Check If Plan File Exists
+- Check for file at: `{project-root}/.claude/issues/{issue-id}/PLAN-{issue-id}.md`
+- Branch based on whether file exists
 
-### Step 4: Interactive Content Capture
-Prompt for specific planning elements:
-- **Technical Approach**: How will this be implemented?
-- **Implementation Steps**: What are the specific steps?
-- **Testing Strategy**: How will this be tested?
-- **Risks & Considerations**: What should be watched out for?
-- **Additional Notes**: Any other important planning details?
+### Step 4A: If File Doesn't Exist (Creation Flow)
 
-### Step 5: Update Plan File
-- Replace placeholder sections with captured content
-- Preserve original structure and metadata
-- Add current date as "Last Updated"
-- Include summary if provided
+**Create File Structure:**
+- Ensure directory exists: `{project-root}/.claude/issues/{issue-id}/`
+- Show creation message: "Creating new plan for Issue #{issue-id}"
 
-### Step 6: Provide Success Feedback
-- Show plan file path
-- Display summary if provided
-- Remind user this creates immutable planning record
-- Suggest next steps (begin implementation, track with `/context-save`)
+**Perform Codebase Analysis:**
+Based on issue type, analyze relevant areas:
+- Check for common project files (package.json, nuxt.config.*, etc.)
+- Identify relevant dependencies from package.json
+- Look for file patterns matching issue type (components/, pages/, etc.)
+- Generate analysis suggestions based on findings
 
-### Content Structure
-Update plan file maintaining this format:
+**Continue to Step 5 (Content Extraction)**
+
+### Step 4B: If File Exists (Update Flow)
+- **Show overwrite warning**: "Plan file already exists. This will update/overwrite the current content. Continue? (y/N)"
+- If user declines, exit gracefully
+- Read existing plan file to understand current state
+- The summary parameter is used for tracking changes
+
+### Step 5: Extract Content from Conversation Context
+
+**Analyze entire conversation history to extract:**
+
+**Technical Planning:**
+- **Technical Approach**: Look for architecture decisions, "we should use", "the approach is"
+- **Implementation Steps**: Numbered lists, task breakdowns, "first we'll", "then we'll"
+- **Testing Strategy**: "test by", "verify that", validation approaches
+- **Risks**: "watch out for", "potential issues", "edge cases"
+
+**Type-Specific Extraction:**
+
+**For `feat` issues:**
+- User flow descriptions and interactions
+- API endpoint designs and data models
+- Component structure and state management
+
+**For `fix` issues:**
+- Root cause analysis ("the problem is caused by")
+- Fix approach ("we can fix this by")
+- Validation steps ("verify the fix by")
+
+**For `refactor` issues:**
+- Current limitations discussed
+- Migration approach ("migrate by", "phase 1/2/3")
+- Compatibility considerations
+
+### Step 6: Review Extracted Information
+
+**Assess completeness:**
+- Check if technical approach is clear
+- Verify implementation steps are actionable
+- Ensure testing strategy exists
+- Confirm risks are identified
+
+**If critical information is missing:**
+- Prepare minimal prompts for only missing pieces
+- Example: "I've extracted most of the plan. Could you clarify: [missing items]?"
+- Allow user to skip with "Let's go with what we have"
+
+### Step 7: Present Summary for Review
+
+Display comprehensive summary:
+```
+I've captured the following plan from our discussion:
+
+**Technical Approach:**
+[extracted approach]
+
+**Implementation Steps:**
+[extracted steps]
+
+**Testing Strategy:**
+[extracted testing]
+
+**Risks & Considerations:**
+[extracted risks]
+
+[Include type-specific sections if relevant]
+
+Would you like to:
+1. Save as-is
+2. Add or modify anything specific
+3. Let me fill in a few missing details
+```
+
+### Step 8: Handle User Response
+
+**If user wants to modify:**
+- Accept specific additions/changes
+- Update the extracted content accordingly
+
+**If user identifies gaps:**
+- Prompt for only those specific items
+- Keep prompts concise and focused
+
+**If user approves:**
+- Proceed to save
+
+### Step 9: Update Plan File
+
+Write the plan file with:
+- Issue context from the issue file
+- Codebase analysis (new or updated)
+- All extracted planning content
+- Current date as "Last Updated"
+- Summary note if provided
+- Proper markdown structure
+
+### Step 10: Provide Success Feedback
+- Show file path where plan was saved
+- Display whether plan was created or updated
+- Brief summary of what was captured
+- Suggest next step: "Ready to start implementation? Track progress with `/context-save {issue-id}`"
+
+### Content Extraction Tips
+
+**Look for these patterns in conversation:**
+- "We should..." → technical approach
+- "First/Next/Then..." → implementation steps
+- "Test by..." → testing strategy
+- "Be careful of..." → risks
+- "The architecture..." → technical approach
+- "Component/Module..." → implementation details
+- "Validate that..." → testing approach
+- "Migration path..." → refactor strategy
+
+**Inference rules:**
+- If discussing data flow → likely technical approach
+- If numbered lists → likely implementation steps
+- If "verify" or "check" → likely testing strategy
+- If "potential issue" → likely risk
+- Detailed discussion → comprehensive plan
+- Brief discussion → high-level plan
+
+### Codebase Analysis Patterns
+
+**For all types, check:**
+- Project structure (src/, lib/, components/, etc.)
+- Configuration files (*.config.js, *.json)
+- Package.json for dependencies and scripts
+- Test file patterns (*.test.*, *.spec.*)
+
+**Type-specific analysis:**
+- **feat**: Look for similar features, component patterns
+- **fix**: Look for related error handling, test coverage
+- **refactor**: Look for current implementation, dependencies
+
+### Error Handling
+- If issue file missing, guide user to create it first
+- Handle file system errors gracefully
+- If context is inadequate for planning, explain what's needed
+- Allow user to cancel operation at any point
+
+## Plan Template Structure
+
+Use this template for new plans:
+
 ```
 # Plan - Issue #{issue-id}: {title}
 
 ## Overview
-{existing-overview}
+{description-from-issue}
 
 ## Codebase Analysis
-{existing-analysis}
+**Project Structure:**
+{detected-structure}
+
+**Relevant Dependencies:**
+{relevant-packages}
+
+**Analysis Suggestions:**
+{type-specific-suggestions}
 
 ## Technical Approach
-{captured-technical-approach}
+{extracted-or-captured-approach}
 
 ## Implementation Steps
-{captured-implementation-steps}
+{extracted-or-captured-steps}
 
 ## Testing Strategy
-{captured-testing-strategy}
+{extracted-or-captured-testing}
 
 ## Risks & Considerations
-{captured-risks-and-considerations}
+{extracted-or-captured-risks}
 
-{type-specific-sections}
+{type-specific-sections if applicable}
 
 ---
-*Created: {originalDate}*
-*Last Updated: {currentDate}*
+*Created: {date}*
+*Last Updated: {date}*
 {summary-line-if-provided}
 ```
 
-### Error Handling
-- Check if plan file exists, guide user to create it first
-- Handle conversation analysis gracefully if no planning content found
-- Provide clear error messages for file system issues
-- Allow user to cancel operation
-
 ## Notes
 
-- Works best when planning discussions are detailed and specific
-- Can handle multiple save operations (updates existing content)
-- Preserves all original template structure and codebase analysis
-- Plan becomes immutable reference after saving (use versioning for major revisions)
-- Analysis focuses on actionable technical details rather than general discussion
+- Always reads issue file first to ensure complete context
+- Intelligently extracts planning details from conversation
+- Minimizes prompts by inferring from discussion
+- Single plan file per issue (no versioning)
+- Can be run multiple times to refine plan content
+- Combines creation and update functionality seamlessly
