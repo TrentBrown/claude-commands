@@ -2,6 +2,8 @@
 
 A comprehensive AI-driven command system for [Claude Code](https://claude.ai/code) that streamlines issue tracking, planning, and development workflows.
 
+> **📖 Note**: This README provides a quick overview. For detailed implementation instructions, command parameters, and technical documentation, see **[CLAUDE.md](./CLAUDE.md)**.
+
 ## Overview
 
 This repository contains a collection of intelligent commands that enhance your Claude Code experience by providing structured workflows for:
@@ -47,9 +49,18 @@ This repository contains a collection of intelligent commands that enhance your 
 - `/session-usage` - Analyze token usage
 - `/git-commit` - Create smart conventional commits
 
-## Documentation
+## 📚 Full Documentation
 
-For complete documentation, implementation details, and AI instructions, see [CLAUDE.md](./CLAUDE.md).
+**⚠️ This README is just an overview!** For comprehensive documentation including:
+- Detailed command parameters and options
+- Step-by-step implementation instructions
+- Content extraction strategies
+- Type-specific templates
+- Workflow integration patterns
+- Error handling details
+- AI-driven architecture explanation
+
+**→ See [CLAUDE.md](./CLAUDE.md) for the complete documentation ←**
 
 ## Project Structure
 
@@ -95,9 +106,19 @@ For complete documentation, implementation details, and AI instructions, see [CL
 /session-load 123
 ```
 
+## Want More Details?
+
+This README covers the basics. For deep dives into:
+- **How each command works internally** 
+- **Customizing commands for your workflow**
+- **Understanding the AI-driven architecture**
+- **Extending the system with new commands**
+
+**→ Check out [CLAUDE.md](./CLAUDE.md) - The Complete Technical Guide**
+
 ## Contributing
 
-Feel free to fork, customize, and submit pull requests. These commands are designed to be modified - just update the markdown instructions!
+Feel free to fork, customize, and submit pull requests. These commands are designed to be modified - just update the markdown instructions! See [CLAUDE.md](./CLAUDE.md) for implementation patterns.
 
 ## License
 
