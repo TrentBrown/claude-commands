@@ -111,7 +111,7 @@ This command handles both creation and updating in the planning workflow:
 
 1. `/issue-save 123` - Create/update issue with requirements
 2. **`/plan-save 123`** - Creates plan if needed, extracts approach from context ← You are here
-3. `/context-save 123` - Track implementation progress
+3. `/progress-save 123` - Track implementation progress
 
 ## Implementation Instructions for AI
 
@@ -250,7 +250,7 @@ Write the plan file with:
 - Show file path where plan was saved
 - Display whether plan was created or updated
 - Brief summary of what was captured
-- Suggest next step: "Ready to start implementation? Track progress with `/context-save {issue-id}`"
+- Suggest next step: "Ready to start implementation? Track progress with `/progress-save {issue-id}`"
 
 ### Content Extraction Tips
 

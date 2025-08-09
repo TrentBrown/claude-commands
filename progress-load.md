@@ -70,7 +70,7 @@ When executing this command, follow these steps:
 ### Step 3: Check Progress File Exists
 - Check for file at: `{project-root}/.claude/issues/{issue-id}/PROGRESS.md`
 - If doesn't exist, inform user that no progress has been tracked yet
-- Suggest starting work and using `/context-save {issue-id}` to track progress
+- Suggest starting work and using `/progress-save {issue-id}` to track progress
 
 ### Step 4: Read and Display Progress
 - Read the complete progress file
@@ -104,7 +104,7 @@ When executing this command, follow these steps:
   - If blocked: "Address the blocker mentioned above"
   - If in progress: "Continue with the next steps identified"
   - If appears complete: "Consider if ready to close the issue"
-- Remind: "Track new progress with `/context-save {issue-id}`"
+- Remind: "Track new progress with `/progress-save {issue-id}`"
 
 ### Error Handling
 - If file doesn't exist, explain no progress tracked yet

@@ -114,7 +114,7 @@ This command handles both creation and saving in the issue workflow:
 1. **`/issue-save 123 [type]`** - Creates template if needed, extracts details from context ← You are here
 2. `/plan-create 123` - Generate implementation plan
 3. `/plan-save 123` - Capture planning results
-4. `/context-save 123` - Track implementation progress
+4. `/progress-save 123` - Track implementation progress
 
 ## Implementation Instructions for AI
 

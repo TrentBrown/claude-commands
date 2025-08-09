@@ -86,7 +86,7 @@ When executing this command, follow these steps:
   - Main risks to watch for
 - Suggest next actions:
   - "Ready to implement? Follow the steps above"
-  - "Track progress with `/context-save {issue-id}`"
+  - "Track progress with `/progress-save {issue-id}`"
 
 ### Step 6: Optional Issue Context
 - Check if corresponding issue file exists
