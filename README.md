@@ -17,8 +17,11 @@ This repository contains a collection of intelligent commands that enhance your 
 
 ## Quick Start
 
-1. Clone this repository to your `.claude/commands/` directory in any project
-2. Use commands like `/issue-save`, `/plan-save`, `/session-load` in Claude Code
+1. Clone this repository to your home directory:
+   ```bash
+   git clone https://github.com/TrentBrown/claude-commands.git ~/.claude/commands
+   ```
+2. Use commands like `/issue-save`, `/plan-save`, `/session-load` in Claude Code in any project
 3. Commands intelligently extract information from conversation context, minimizing prompts
 
 ## Key Features
@@ -65,12 +68,14 @@ This repository contains a collection of intelligent commands that enhance your 
 ## Project Structure
 
 ```
-.claude/
-├── commands/           # This repository
+~/.claude/
+├── commands/           # This repository (global commands)
 │   ├── *.md           # Command implementation files
 │   ├── templates.js   # Issue and plan templates
 │   └── git/           # Git helpers
-└── issues/            # Your project's issues (created by commands)
+
+[Your Project]/.claude/
+└── issues/            # Project-specific issues (created by commands)
     └── {issue-id}/
         ├── ISSUE-{id}.md
         ├── PLAN-{id}.md
