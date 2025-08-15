@@ -21,7 +21,7 @@ This is a collection of **AI-driven Claude Code commands** where:
   - If plan exists: Updates with extracted planning details
 
 ### Session Management Commands
-- `/session-load <issue-id>` - AI loads complete context for an issue (issue, plan, progress, learnings)
+- `/session-load <issue-id>` - AI loads complete context for an issue (issue, plan, progress, learnings, project docs)
 - `/session-save <issue-id>` - AI saves current session state and progress
 - `/session-usage` - AI analyzes and reports on session token usage
 
@@ -30,6 +30,7 @@ This is a collection of **AI-driven Claude Code commands** where:
 - `/plan-load <issue-id>` - AI loads just the plan file for implementation guidance
 - `/progress-load <issue-id>` - AI loads just the progress file to see work history
 - `/learnings-load` - AI loads project learnings for accumulated wisdom
+- `/project-load [filename]` - AI loads project documentation (specific file or all if no filename)
 
 ### Progress & Learning Commands
 - `/progress-save <issue-id> [mode]` - AI saves implementation progress (modes: progress, quick, discovery, blocker)
@@ -53,6 +54,7 @@ This is a collection of **AI-driven Claude Code commands** where:
 ├── progress-load.md       # AI execution instructions for loading progress files
 ├── learnings-save.md      # AI execution instructions for saving learnings
 ├── learnings-load.md      # AI execution instructions for loading project learnings
+├── project-load.md        # AI execution instructions for loading project documentation
 ├── session-load.md        # AI execution instructions for loading full session context
 ├── session-save.md        # AI execution instructions for saving session state
 ├── session-usage.md       # AI execution instructions for analyzing token usage
@@ -79,6 +81,7 @@ The commands implement a structured issue management workflow driven by AI:
    - `/plan-load <id>` - AI loads specific plan file
    - `/progress-load <id>` - AI loads specific progress file
    - `/learnings-load` - AI loads project learnings
+   - `/project-load [file]` - AI loads project documentation
 
 ## Issue Types and Templates
 
@@ -100,6 +103,31 @@ The commit command enforces conventional commit format with emoji:
 - Comprehensive emoji mapping for different change types
 - Pre-commit validation (lint, build checks)
 
+## Project Memory
+
+The `.claude/project/` directory provides persistent project-wide documentation:
+
+### Purpose
+- Store stable project knowledge that applies across all issues
+- Document APIs, schemas, architecture decisions, conventions
+- Provide reference material that AI can access during any session
+- Complement issue-specific memory with project-wide context
+
+### Usage
+- **Creating**: Developers manually create markdown files in `.claude/project/`
+- **Loading**: Automatically loaded by `/session-load` command
+- **Accessing**: Use `/project-load [filename]` to load specific files
+- **Loading All**: Use `/project-load` without arguments to load all project files
+
+### Common Project Documentation Types
+- `API.md` - Backend API specifications and endpoints
+- `database-schema.md` - Database structure and relationships
+- `architecture.md` - System design and architectural decisions
+- `deployment.md` - Deployment procedures and environments
+- `conventions.md` - Code style and project conventions
+- `security.md` - Security guidelines and requirements
+- `integrations.md` - Third-party service integrations
+
 ## Code Analysis Features
 
 The planning commands include intelligent codebase analysis:
@@ -118,6 +146,12 @@ Issues are organized in `.claude/issues/<issue-id>/` containing:
 Project-wide files in `.claude/`:
 - `LEARNINGS.md` - Accumulated project learnings and discoveries
 - `CLAUDE.md` - Project-specific instructions for Claude
+
+Project documentation in `.claude/project/`:
+- Any number of markdown files with project-specific documentation
+- Examples: `API.md`, `database-schema.md`, `architecture.md`, `deployment.md`
+- Created and maintained manually by developers
+- Loaded automatically by `/session-load` command
 
 ## AI-Driven Architecture
 

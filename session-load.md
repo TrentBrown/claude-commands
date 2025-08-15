@@ -42,7 +42,13 @@ Examples:
    - Displays important discoveries
    - References gotchas to remember
 
-5. **Provides unified summary**:
+5. **Loads project documentation**:
+   - Reads all files from .claude/project/
+   - Shows available project references
+   - Includes API specs, schemas, architecture
+   - Provides project-wide context
+
+6. **Provides unified summary**:
    - Current status overview
    - What's been done
    - What's left to do
@@ -64,6 +70,7 @@ Files are loaded in logical sequence:
 2. **PLAN** - How we're building it
 3. **PROGRESS** - Where we are now
 4. **LEARNINGS** - What we've discovered
+5. **PROJECT** - Project-wide documentation and context
 
 ## Output Format
 
@@ -107,6 +114,16 @@ Recent Insights:
 
 Watch out for:
 • [Gotcha to remember]
+
+════════════════════════════════════════
+PROJECT DOCUMENTATION
+════════════════════════════════════════
+Available References:
+• API.md - Backend API specifications
+• database-schema.md - Database structure
+• architecture.md - System design
+
+💡 Load specific docs: /project-load <file>
 
 ════════════════════════════════════════
 READY TO CONTINUE
@@ -160,6 +177,13 @@ When executing this command, follow these steps:
 - Extract: Recent insights, gotchas, quick reference
 - If missing: Note "No learnings captured yet"
 
+**Load PROJECT files:**
+- Path: `.claude/project/` directory
+- Read all markdown files in directory
+- Extract: Filenames and brief descriptions
+- If directory missing or empty: Note "No project documentation"
+- Show list of available files with short descriptions
+
 ### Step 3: Generate Summary
 Create structured output with:
 1. Issue overview (title, type, core requirement)
@@ -172,7 +196,11 @@ Create structured output with:
 4. Key learnings:
    - 2-3 most recent/important insights
    - Critical gotchas to remember
-5. Next steps:
+5. Project documentation:
+   - List of available project files
+   - Brief description of each
+   - Note most relevant files for current issue
+6. Next steps:
    - From progress file "Next Steps"
    - Or from uncompleted milestones
 
