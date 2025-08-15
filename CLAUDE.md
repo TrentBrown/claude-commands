@@ -21,7 +21,7 @@ This is a collection of **AI-driven Claude Code commands** where:
   - If plan exists: Updates with extracted planning details
 
 ### Session Management Commands
-- `/session-load <issue-id>` - AI loads complete context for an issue (issue, plan, progress, learnings, project docs)
+- `/session-load <issue-id>` - AI loads complete context for an issue (issue, plan, progress, learnings, project docs, subproject docs)
 - `/session-save <issue-id>` - AI saves current session state and progress
 - `/session-usage` - AI analyzes and reports on session token usage
 
@@ -118,6 +118,27 @@ The `.claude/project/` directory provides persistent project-wide documentation:
 - **Loading**: Automatically loaded by `/session-load` command
 - **Accessing**: Use `/project-load [filename]` to load specific files
 - **Loading All**: Use `/project-load` without arguments to load all project files
+
+### Subproject Support
+- **Configuration**: Define subprojects in `qp.config.js` at project root
+- **Structure**: Each subproject can have its own `.claude/project/` directory
+- **Loading**: `/session-load` automatically loads memory from all configured subprojects
+- **Organization**: Keeps related project documentation together in monorepos
+
+Example `qp.config.js`:
+```javascript
+export const config = {
+    project: {
+        id: 'main-project',
+        name: { display: 'Main Project' }
+    },
+    subprojects: [
+        "client",
+        "lambdas/backend",
+        "shared/utils"
+    ]
+};
+```
 
 ### Common Project Documentation Types
 - `API.md` - Backend API specifications and endpoints

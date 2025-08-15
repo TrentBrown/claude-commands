@@ -48,7 +48,13 @@ Examples:
    - Includes API specs, schemas, architecture
    - Provides project-wide context
 
-6. **Provides unified summary**:
+6. **Loads subproject documentation** (if qp.config.js exists):
+   - Checks for qp.config.js in project root
+   - Reads subprojects list from config
+   - Loads .claude/project/ files from each subproject
+   - Provides cross-project context
+
+7. **Provides unified summary**:
    - Current status overview
    - What's been done
    - What's left to do
@@ -71,6 +77,7 @@ Files are loaded in logical sequence:
 3. **PROGRESS** - Where we are now
 4. **LEARNINGS** - What we've discovered
 5. **PROJECT** - Project-wide documentation and context
+6. **SUBPROJECTS** - Documentation from related subprojects (if configured)
 
 ## Output Format
 
@@ -124,6 +131,15 @@ Available References:
 • architecture.md - System design
 
 💡 Load specific docs: /project-load <file>
+
+════════════════════════════════════════
+SUBPROJECT DOCUMENTATION
+════════════════════════════════════════
+Loaded from client:
+• API.md - Client API integration
+
+Loaded from lambdas/backend:
+• handlers.md - Lambda handler specs
 
 ════════════════════════════════════════
 READY TO CONTINUE
@@ -184,6 +200,22 @@ When executing this command, follow these steps:
 - If directory missing or empty: Note "No project documentation"
 - Show list of available files with short descriptions
 
+**Load SUBPROJECT files (if configured):**
+- Check if `qp.config.js` exists in project root
+- If exists:
+  - Import the config using dynamic import: `const { config } = await import('./qp.config.js')`
+  - Check if `config.subprojects` exists and is a non-empty array
+  - For each subproject path in the array:
+    - Resolve path: `{projectRoot}/{subprojectPath}/.claude/project/`
+    - Check if the directory exists
+    - If exists, read all `.md` files in that directory
+    - Store files with subproject context (don't display contents)
+    - Track: subproject name, number of files loaded
+- If no qp.config.js: Skip silently
+- If qp.config.js exists but no subprojects: Skip silently
+- If subproject path doesn't have .claude/project/: Skip that subproject silently
+- Display summary showing files loaded from each subproject (names only)
+
 ### Step 3: Generate Summary
 Create structured output with:
 1. Issue overview (title, type, core requirement)
@@ -200,7 +232,11 @@ Create structured output with:
    - List of available project files
    - Brief description of each
    - Note most relevant files for current issue
-6. Next steps:
+6. Subproject documentation (if applicable):
+   - List files loaded from each subproject
+   - Group by subproject name
+   - Show only if subprojects exist
+7. Next steps:
    - From progress file "Next Steps"
    - Or from uncompleted milestones
 
@@ -217,6 +253,10 @@ Add helpful context:
 - No progress: Info, note tracking will start
 - No learnings: Info, normal for new issues
 - Multiple missing: Suggest starting with issue creation
+- qp.config.js errors: Handle gracefully
+  - Import errors: Skip subproject loading silently
+  - Invalid config structure: Skip subproject loading silently
+  - Invalid subproject paths: Skip that specific subproject
 
 ### File Reading Strategy
 - Read files fully but summarize intelligently
