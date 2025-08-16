@@ -9,22 +9,35 @@ To create a commit, just type:
 /git-commit
 ```
 
-Or with options:
+With options:
 ```
 /git-commit --no-verify
+/git-commit "focus on the refactoring changes"
+/git-commit --no-verify "emphasize the performance improvements"
 ```
+
+## Parameters
+
+- `--no-verify`: Skip pre-commit checks (lint, build)
+- `[instructions]`: Optional guidance for the commit message (any text that's not --no-verify)
+  - Examples:
+    - `/git-commit "focus on API changes"`
+    - `/git-commit "this fixes the login bug"`
+    - `/git-commit --no-verify "emphasize security improvements"`
 
 ## What This Command Does
 
-1. Unless specified with `--no-verify`, automatically runs pre-commit checks:
+1. Parses any provided instructions to guide commit message generation
+2. Unless specified with `--no-verify`, automatically runs pre-commit checks:
    - `pnpm lint` to ensure code quality
    - `pnpm build` to verify the build succeeds
-2. Checks which files are staged with `git status`
-3. If 0 files are staged, automatically adds all modified and new files with `git add`
-4. Performs a `git diff` to understand what changes are being committed
-5. Analyzes the diff to determine if multiple distinct logical changes are present
-6. If multiple distinct changes are detected, suggests breaking the commit into multiple smaller commits
-7. For each commit (or the single commit if not split), creates a commit message using emoji conventional commit format
+3. Checks which files are staged with `git status`
+4. If 0 files are staged, automatically adds all modified and new files with `git add`
+5. Performs a `git diff` to understand what changes are being committed
+6. Analyzes the diff to determine if multiple distinct logical changes are present
+7. Incorporates any provided instructions into the commit message suggestion
+8. If multiple distinct changes are detected, suggests breaking the commit into multiple smaller commits
+9. For each commit (or the single commit if not split), creates a commit message using emoji conventional commit format
 
 ## Best Practices for Commits
 
@@ -154,6 +167,10 @@ When executing this command, follow these steps:
 ### Step 1: Parse Arguments
 - Check for `--no-verify` flag in arguments
 - Set `noVerify` flag accordingly (default: false)
+- Extract any additional text as commit instructions:
+  - Remove `--no-verify` from arguments if present
+  - Join remaining arguments as instruction string
+  - Store instructions for use in commit message generation
 
 ### Step 2: Validate Git Repository
 - Run `git rev-parse --git-dir` to check if in a git repository
@@ -186,10 +203,18 @@ If `noVerify` is false:
 - Run `git diff --cached --name-only` to get list of changed files
 - Import commit-helpers.js: `import { analyzeChanges } from './git-commit-helpers.js'`
 - Call `analyzeChanges(diffOutput, fileList)` to get suggested commit message
+- If user provided instructions:
+  - Incorporate instructions into the analysis
+  - Adjust commit message focus based on instructions
+  - Example: If user said "focus on performance", emphasize perf improvements
 - Display suggested commit message
 
 ### Step 6: Get User Input for Commit Message
 - Show suggested message from analysis
+- If user provided instructions, mention they were considered:
+  - "Suggested message (based on your instructions):"
+- Otherwise show standard prompt:
+  - "Suggested commit message:"
 - Prompt: "Enter your commit message (or press Enter to use suggested):"
 - If user provides message, use it; otherwise use suggested message
 
@@ -228,7 +253,9 @@ Import from commit-helpers.js:
 - Provide clear error messages for common issues
 - Handle user interruption (Ctrl+C) gracefully
 
-### Example Execution Flow
+### Example Execution Flows
+
+**Basic usage:**
 ```
 User: /git-commit
 AI: 
@@ -241,9 +268,36 @@ AI:
 7. Shows success and commit details
 ```
 
+**With instructions:**
+```
+User: /git-commit "focus on the security fixes"
+AI:
+1. Validates git repository
+2. Runs pre-commit checks
+3. Checks staged files
+4. Analyzes changes with focus on security → suggests "🔒️ fix: patch authentication vulnerability"
+5. Shows: "Suggested message (based on your instructions):"
+6. Creates commit
+7. Shows success
+```
+
+**With --no-verify and instructions:**
+```
+User: /git-commit --no-verify "emphasize the refactoring"
+AI:
+1. Validates git repository
+2. Skips pre-commit checks
+3. Analyzes changes → suggests "♻️ refactor: restructure component architecture"
+4. Creates commit focusing on refactoring aspects
+```
+
 ## Command Options
 
 - `--no-verify`: Skip running the pre-commit checks (lint, build, generate:docs)
+- `[instructions]`: Optional text to guide the commit message generation
+  - Can be combined with --no-verify
+  - Helps AI focus on specific aspects of the changes
+  - Examples: "focus on bug fixes", "emphasize API changes", "this is a hotfix"
 
 ## Important Notes
 
@@ -252,6 +306,8 @@ AI:
 - If specific files are already staged, the command will only commit those files
 - If no files are staged, it will automatically stage all modified and new files
 - The commit message will be constructed based on the changes detected
+- Any provided instructions will guide the focus and emphasis of the commit message
+- Instructions are optional and can be combined with --no-verify flag
 - Before committing, the command will review the diff to identify if multiple commits would be more appropriate
 - If suggesting multiple commits, it will help you stage and commit the changes separately
 - Always reviews the commit diff to ensure the message matches the changes
