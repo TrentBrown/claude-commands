@@ -74,13 +74,20 @@ Found and loaded 3 files:
 
 When executing this command, follow these steps:
 
+### IMPORTANT: Tool Usage
+- **ALWAYS use Claude Code's internal Read tool** for reading files
+- **NEVER use external shells (iTerm MCP, etc.)** for file operations
+- **Use the LS tool** for listing directory contents
+- **Use the Bash tool only** for checking if paths exist
+- All file reading must be done through the Read tool to ensure proper access
+
 ### Step 1: Parse Arguments
 - Extract filename from arguments (optional)
 - If filename provided, normalize (add .md if missing)
 - Find project root (look for .git or package.json)
 
 ### Step 2: Check Project Directory
-- Path: `.claude/project/`
+- Use LS tool to check `.claude/project/` directory
 - If directory doesn't exist:
   - Note that no project documentation exists yet
   - Suggest creating `.claude/project/` directory
@@ -89,20 +96,21 @@ When executing this command, follow these steps:
 ### Step 3A: If Filename Provided
 **Load specific file:**
 - Path: `.claude/project/{filename}`
+- Use Read tool to load the file
 - If file exists:
-  - Read complete contents
+  - Read complete contents using Read tool
   - Display with clear formatting
-  - Show file size and last modified if available
+  - Show file size if available
 - If file doesn't exist:
-  - List available files instead
+  - Use LS tool to list available files
   - Suggest closest match if possible
 
 ### Step 3B: If No Filename Provided
 **Load all files:**
-- Read directory `.claude/project/`
+- Use LS tool to list `.claude/project/` directory
 - Filter for markdown files (*.md)
 - For each file found:
-  - Read file contents into memory (don't display)
+  - Use Read tool to load file contents into memory (don't display)
   - Track filename and file size
 - Display summary:
   - List filenames with sizes

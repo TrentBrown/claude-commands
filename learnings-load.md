@@ -51,18 +51,24 @@ This command is useful for:
 
 When executing this command, follow these steps:
 
+### IMPORTANT: Tool Usage
+- **ALWAYS use Claude Code's internal Read tool** for reading files
+- **NEVER use external shells (iTerm MCP, etc.)** for file operations
+- **Use the Bash tool only** for checking if directories exist
+- All file reading must be done through the Read tool to ensure proper access
+
 ### Step 1: Find Project Root
 - Look for .git directory or package.json file
 - Start from current directory and walk up the directory tree
 - If not found, show error about not being in a project directory
 
 ### Step 2: Check Learnings File Exists
-- Check for file at: `{project-root}/.claude/LEARNINGS.md`
+- Use Read tool to check file at: `{project-root}/.claude/LEARNINGS.md`
 - If doesn't exist, inform user that no learnings have been saved yet
 - Suggest that learnings will be created as discoveries are made
 
 ### Step 3: Read and Display Learnings
-- Read the complete learnings file
+- Use Read tool to load the complete learnings file
 - Display it with a header indicating what's being loaded
 - Format:
   ```

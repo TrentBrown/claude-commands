@@ -166,6 +166,12 @@ Standard session workflow:
 
 When executing this command, follow these steps:
 
+### IMPORTANT: Tool Usage
+- **ALWAYS use Claude Code's internal Read tool** for reading files
+- **NEVER use external shells (iTerm MCP, etc.)** for file operations
+- **Use the Bash tool only** for checking directories or file existence
+- All file reading must be done through the Read tool to ensure proper access
+
 ### Step 1: Parse and Validate
 - Extract `issue-id` from arguments (required)
 - Find project root (look for .git or package.json)
@@ -174,41 +180,41 @@ When executing this command, follow these steps:
 ### Step 2: Load Files in Order
 
 **Load ISSUE file:**
-- Path: `.claude/issues/{id}/ISSUE-{id}.md`
+- Use Read tool with path: `.claude/issues/{id}/ISSUE-{id}.md`
 - Extract: Title, type, requirements, acceptance criteria
 - If missing: Show error and suggest `/issue-create {id}`
 
 **Load PLAN file:**
-- Path: `.claude/issues/{id}/PLAN-{id}.md`
+- Use Read tool with path: `.claude/issues/{id}/PLAN-{id}.md`
 - Extract: Approach, implementation steps, key decisions
 - If missing: Note but continue (plan optional)
 
 **Load PROGRESS file:**
-- Path: `.claude/issues/{id}/PROGRESS-{id}.md`
+- Use Read tool with path: `.claude/issues/{id}/PROGRESS-{id}.md`
 - Extract: Current percentage, milestones, last session
 - If missing: Note "No progress tracked yet"
 
 **Load LEARNINGS file:**
-- Path: `.claude/issues/{id}/LEARNINGS-{id}.md`
+- Use Read tool with path: `.claude/issues/{id}/LEARNINGS-{id}.md`
 - Extract: Recent insights, gotchas, quick reference
 - If missing: Note "No learnings captured yet"
 
 **Load PROJECT files:**
-- Path: `.claude/project/` directory
-- Read all markdown files in directory
+- Use LS tool to list `.claude/project/` directory
+- Use Read tool for each markdown file found
 - Extract: Filenames and brief descriptions
 - If directory missing or empty: Note "No project documentation"
 - Show list of available files with short descriptions
 
 **Load SUBPROJECT files (if configured):**
-- Check if `qp.config.js` exists in project root
+- Use Read tool to check if `qp.config.js` exists in project root
 - If exists:
-  - Import the config using dynamic import: `const { config } = await import('./qp.config.js')`
-  - Check if `config.subprojects` exists and is a non-empty array
+  - Use Read tool to read the config file
+  - Parse to check if `config.subprojects` exists and is a non-empty array
   - For each subproject path in the array:
     - Resolve path: `{projectRoot}/{subprojectPath}/.claude/project/`
-    - Check if the directory exists
-    - If exists, read all `.md` files in that directory
+    - Use LS tool to check if the directory exists
+    - If exists, use Read tool for all `.md` files in that directory
     - Store files with subproject context (don't display contents)
     - Track: subproject name, number of files loaded
 - If no qp.config.js: Skip silently
