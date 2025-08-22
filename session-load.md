@@ -42,19 +42,25 @@ Examples:
    - Displays important discoveries
    - References gotchas to remember
 
-5. **Loads project documentation**:
-   - Reads all files from .claude/project/
+5. **Loads recent git commits**:
+   - Shows last 5 commits from current branch
+   - Includes full commit messages (subject and body)
+   - Excludes merge commits for clarity
+   - Provides context on recent changes
+
+6. **Loads project documentation**:
+   - Reads all files from /docs/
    - Shows available project references
    - Includes API specs, schemas, architecture
    - Provides project-wide context
 
-6. **Loads subproject documentation** (if qp.config.js exists):
+7. **Loads subproject documentation** (if qp.config.js exists):
    - Checks for qp.config.js in project root
    - Reads subprojects list from config
-   - Loads .claude/project/ files from each subproject
+   - Loads /docs/ files from each subproject
    - Provides cross-project context
 
-7. **Provides unified summary**:
+8. **Provides unified summary**:
    - Current status overview
    - What's been done
    - What's left to do
@@ -76,8 +82,9 @@ Files are loaded in logical sequence:
 2. **PLAN** - How we're building it
 3. **PROGRESS** - Where we are now
 4. **LEARNINGS** - What we've discovered
-5. **PROJECT** - Project-wide documentation and context
-6. **SUBPROJECTS** - Documentation from related subprojects (if configured)
+5. **GIT COMMITS** - Recent actual changes
+6. **PROJECT** - Project-wide documentation and context
+7. **SUBPROJECTS** - Documentation from related subprojects (if configured)
 
 ## Output Format
 
@@ -121,6 +128,15 @@ Recent Insights:
 
 Watch out for:
 • [Gotcha to remember]
+
+════════════════════════════════════════
+RECENT COMMITS
+════════════════════════════════════════
+[hash] [subject line]
+[commit body if present]
+
+[hash] [subject line]
+[commit body if present]
 
 ════════════════════════════════════════
 PROJECT DOCUMENTATION
@@ -199,8 +215,15 @@ When executing this command, follow these steps:
 - Extract: Recent insights, gotchas, quick reference
 - If missing: Note "No learnings captured yet"
 
+**Load GIT COMMITS:**
+- Use Bash tool to run: `git log -5 --format="%h %s%n%b" --no-merges`
+- Extract: Recent commit hashes, subjects, and bodies
+- Show actual changes made to the codebase
+- If no commits or git error: Note "No recent commits"
+- Keep full commit messages to preserve implementation context
+
 **Load PROJECT files:**
-- Use LS tool to list `.claude/project/` directory
+- Use LS tool to list `/docs/` directory
 - Use Read tool for each markdown file found
 - Extract: Filenames and brief descriptions
 - If directory missing or empty: Note "No project documentation"
@@ -212,14 +235,14 @@ When executing this command, follow these steps:
   - Use Read tool to read the config file
   - Parse to check if `config.subprojects` exists and is a non-empty array
   - For each subproject path in the array:
-    - Resolve path: `{projectRoot}/{subprojectPath}/.claude/project/`
+    - Resolve path: `{projectRoot}/{subprojectPath}/docs/`
     - Use LS tool to check if the directory exists
     - If exists, use Read tool for all `.md` files in that directory
     - Store files with subproject context (don't display contents)
     - Track: subproject name, number of files loaded
 - If no qp.config.js: Skip silently
 - If qp.config.js exists but no subprojects: Skip silently
-- If subproject path doesn't have .claude/project/: Skip that subproject silently
+- If subproject path doesn't have /docs/: Skip that subproject silently
 - Display summary showing files loaded from each subproject (names only)
 
 ### Step 3: Generate Summary
@@ -234,15 +257,19 @@ Create structured output with:
 4. Key learnings:
    - 2-3 most recent/important insights
    - Critical gotchas to remember
-5. Project documentation:
+5. Recent commits:
+   - Show last 5 non-merge commits
+   - Include full commit messages
+   - Highlight relevant changes
+6. Project documentation:
    - List of available project files
    - Brief description of each
    - Note most relevant files for current issue
-6. Subproject documentation (if applicable):
+7. Subproject documentation (if applicable):
    - List files loaded from each subproject
    - Group by subproject name
    - Show only if subprojects exist
-7. Next steps:
+8. Next steps:
    - From progress file "Next Steps"
    - Or from uncompleted milestones
 

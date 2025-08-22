@@ -37,8 +37,9 @@ This is a collection of **AI-driven Claude Code commands** where:
 - `/learnings-save [topic]` - AI captures and saves project learnings and discoveries
 
 ### Development Commands
-- `/git-commit [--no-verify]` - AI executes intelligent commit workflow with conventional commits and emoji
+- `/git-commit [--no-verify] [instructions]` - AI executes intelligent commit workflow with conventional commits and emoji
   - AI runs pre-commit checks (lint, build) unless `--no-verify` specified
+  - Optional instructions guide the commit message focus (e.g., "focus on API changes")
   - AI analyzes changes using git/commit-helpers.js to suggest appropriate commit messages
   - AI supports extensive emoji mapping for commit types
 
@@ -100,6 +101,7 @@ Supported issue types with specialized templates:
 The commit command enforces conventional commit format with emoji:
 - Format: `<emoji> <type>: <description>`
 - Automatic change analysis for appropriate commit type suggestion
+- Optional instructions to guide message focus and emphasis
 - Comprehensive emoji mapping for different change types
 - Pre-commit validation (lint, build checks)
 
